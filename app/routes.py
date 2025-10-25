@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, flash, session, render_template, jsonify
+from flask import Blueprint, request, redirect, url_for, flash, session, render_template, jsonify, current_app
 from . import db
 from .models import User, Product
 import pandas as pd 
@@ -8,29 +8,59 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 main = Blueprint('main', __name__)
 
-# -----------------
-# 1. ONE-TIME DATA & MODEL SETUP
-# -----------------
-try:
-    # --- Load your main product dataset ---
-    train_data = pd.read_csv('models/products.csv')
+# --- Create placeholders for our model and data ---
+# We will load these *once* when the first request comes in.
+train_data = None
+tfidf_vectorizer = None
+cosine_similarities_content = None
+indices = None
+tfidf_matrix_content = None
 
-    # --- Pre-compute the TF-IDF and Similarity Matrix ---
+def load_model_data():
+    """
+    Loads product data from the database and builds the TF-IDF model.
+    This function will run only once.
+    """
+    # 'global' tells Python we want to modify the placeholders
+    global train_data, tfidf_vectorizer, cosine_similarities_content, indices, tfidf_matrix_content
+    
+    print("--- Loading model data from PostgreSQL ---")
+    
+    # 1. Load data from the SQL database into a Pandas DataFrame
+    #    This REPLACES pd.read_csv()
+    with current_app.app_context():
+        # This query selects all products from your 'product' table
+        query = db.select(Product)
+        # pd.read_sql uses your app's existing database connection
+        df = pd.read_sql(query, db.engine)
+
+    # 2. Keep only the rows we need (where 'Name' is not null)
+    df = df[df['Name'].notna()].reset_index()
+
+    # 3. Build the TF-IDF model (same as before)
     tfidf_vectorizer = TfidfVectorizer(stop_words='english')
-
-    tfidf_matrix_content = tfidf_vectorizer.fit_transform(train_data['Tags'])
+    df['Tags'] = df['Tags'].fillna('') 
+    tfidf_matrix_content = tfidf_vectorizer.fit_transform(df['Tags'])
     cosine_similarities_content = cosine_similarity(tfidf_matrix_content, tfidf_matrix_content)
 
-    # --- Create a mapping from item name to index ---
-    indices = pd.Series(train_data.index, index=train_data['Name']).drop_duplicates()
+    # 4. Create the mapping (use the new 'index')
+    indices = pd.Series(df.index, index=df['Name']).drop_duplicates()
     
-    print("--- Product data and similarity matrix loaded successfully! ---")
+    # 5. Store the DataFrame
+    train_data = df
+    
+    print("--- Model data loaded successfully. ---")
 
-except FileNotFoundError:
-    print("--- ERROR: Product data file not found! ---")
-    train_data = pd.DataFrame() # Create empty dataframe to avoid crashes
-    cosine_similarities_content = None
-    indices = pd.Series()
+
+@main.before_app_request
+def before_first_request():
+    """
+    This special Flask function runs before the very first request
+    to the app. We use it to load our model.
+    """
+    global train_data
+    if train_data is None: # Only load if it's not already loaded
+        load_model_data()
 
 def get_recommendations(item_name, top_n=10):
     # Use the pre-computed global variables
@@ -98,17 +128,17 @@ def search_recommendations(query, top_n=10):
     return recommended_items_details
 
 # ----------------- Home Page -----------------
+# In app/routes.py
 @main.route('/')
 def index():
+    trending_products = []
     try:
-        # Read the entire CSV
-        df_full = pd.read_csv('models/trending_products.csv')
-
-        df = df_full.head(8) 
+        # --- This file is probably small and NOT in LFS, so it's OK ---
+        df = pd.read_csv('models/trending_products.csv')
+        df = df.head(8) 
 
         image_files = [f'images/p{i+1}.jpeg' for i in range(len(df))]
 
-        trending_products = []
         for i, row in df.iterrows():
             trending_products.append({
                 "Name": row['Name'],
@@ -118,12 +148,10 @@ def index():
                 "ImageURL": image_files[i] 
             })
     
-    except FileNotFoundError:
-        flash('Error: Could not find trending products data file.', 'error')
-        trending_products = [] 
     except Exception as e:
-        flash(f'An error occurred loading products: {e}', 'error')
-        trending_products = [] 
+        # If this fails, just show an empty list
+        print(f"Error loading trending products: {e}") 
+        flash('Could not load trending products.', 'error')
     
     return render_template('index.html', trending_products=trending_products)
 
@@ -246,3 +274,4 @@ def settings():
     db.session.commit()
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('main.index'))
+
