@@ -41,6 +41,8 @@ def create_app():
     # Initialize database with app
     db.init_app(app)
 
+    app.app_context().push()
+
     from . import models 
 
     @app.cli.command("init-db")
