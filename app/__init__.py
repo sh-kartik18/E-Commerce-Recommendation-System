@@ -2,7 +2,9 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
+from dotenv import load_dotenv
 
+load_dotenv()
 # Create the database instance
 db = SQLAlchemy()
 
@@ -111,3 +113,4 @@ def create_app():
     app.register_blueprint(main)
 
     return app
+
