@@ -1,0 +1,6 @@
+Flask
+Flask-SQLAlchemy
+gunicorn            # The production server for Flask
+pandas
+scikit-learn
+psycopg2-binary     # The driver for PostgreSQL
