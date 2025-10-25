@@ -23,3 +23,6 @@ Thumbs.db
 # IDE/Editor configuration files
 .vscode/
 .idea/
+
+# Environment file
+.env
