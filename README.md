@@ -33,7 +33,7 @@ The system allows users to search the product catalog and receive personalized, 
 
 The final application is designed for reliable, scalable hosting.
 
-1.  **Compute/Web App:** Deployed on a platform like **Replit** (or PythonAnywhere).
+1.  **Compute/Web App:** Not deployed yet.
 2.  **Database:** Hosted on **Neon** (serverless PostgreSQL).
 
 The application uses the `DATABASE_URL` environment variable for seamless connection to the live database in production.
