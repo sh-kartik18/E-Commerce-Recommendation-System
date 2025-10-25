@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Home - E-Commerce Recommendation System{% endblock %}
+
+{% block content %}
+
+<div class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <video class="video-background" autoplay loop muted>
+        <source src="{{ url_for('static', filename='video/promo.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+</div>
+
+<div class="text-center mb-5">
+  <a href="{{ url_for('main.main_app') }}" class="btn btn-primary btn-lg">Go to Main Page</a>
+</div>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Trending Products</h2>
+  <div class="row">
+    {% for product in trending_products %}
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+        <a href="#" class="text-decoration-none recommend-trigger" 
+           data-bs-toggle="modal" 
+           data-bs-target="#recommendModal"
+           data-product-name="{{ product.Name }}">
+          
+          <div class="card h-100">
+            <img src="{{ url_for('static', filename=product.ImageURL) }}" class="card-img-top product-image" alt="{{ product.Name }}">
+            <div class="card-body">
+              <h5 class="card-title">{{ product.Name[:40] }}{% if product.Name|length > 40 %}...{% endif %}</h5>
+              
+              {% if product.Brand is string %}
+              <p class="card-text">Brand: {{ product.Brand.split(' ')[0] | capitalize }}</p>
+              {% endif %}
+              
+              <p class="card-text">Rating: {{ product.Rating | default(0) | round(1) }} | Reviews: {{ product.ReviewCount | default(0) | int }}</p>
+            </div>
+          </div>
+        </a> </div>
+    {% endfor %}
+  </div> <div class="modal fade" id="recommendModal" tabindex="-1" aria-labelledby="recommendModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl"> <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="recommendModalLabel">Loading...</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="modal-body-content" class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div> {% endblock %}

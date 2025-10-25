@@ -1,0 +1,92 @@
+{% extends "base.html" %} {% block title %}Recommendation System{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <h1 class="text-center mb-3">E-Commerce Recommendation System</h1>
+      <p class="text-center text-muted mb-4">
+        Enter a product name and choose how many similar products you'd like to
+        see.
+      </p>
+
+      <form action="{{ url_for('main.recommend') }}" method="POST">
+        <div class="mb-3">
+          <label for="product_name" class="form-label">Product Name</label>
+          <input
+            type="text"
+            class="form-control form-control-lg"
+            id="product_name"
+            name="product_name"
+            placeholder="Search for a product..."
+            aria-label="Search for a product"
+            required
+          />
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="top_n" class="form-label"
+              >How many results? (1-10)</label
+            >
+            <input
+              type="number"
+              class="form-control form-control-lg"
+              id="top_n"
+              name="top_n"
+              min="1"
+              max="10"
+              value="5"
+              required
+            />
+          </div>
+
+          <div class="col-md-6 d-flex align-items-end mb-3">
+            <button class="btn btn-primary btn-lg w-100" type="submit">
+              Search
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row mt-5" id="recommendation-results">
+    {% if results %}
+    <div class="col-12">
+      <h2 class="mb-4">Recommendations for "{{ searched_item }}"</h2>
+    </div>
+
+    {% for product in results %}
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+      <div class="card h-100">
+        <img
+          src="{{ product.ImageURL }}"
+          class="card-img-top product-image"
+          alt="{{ product.Name }}"
+        />
+
+        <div class="card-body">
+          <h5 class="card-title">
+            {{ product.Name[:40] }}{% if product.Name|length > 40 %}...{% endif
+            %}
+          </h5>
+
+          {% if product.Brand %}
+          <p class="card-text">
+            Brand: {{ product.Brand.split(' ')[0] | capitalize }}
+          </p>
+          {% endif %}
+
+          <p class="card-text">
+            Rating: {{ product.Rating | default(0) | round(1) }} | Reviews: {{
+            product.ReviewCount | default(0) | int }}
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% endif %}
+  </div>
+</div>
+
+{% endblock %}

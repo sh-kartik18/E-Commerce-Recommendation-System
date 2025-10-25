@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}E-Commerce Recommendation System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .navbar {
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .video-background {
+        width: 100%;
+        height: 60vh;
+        object-fit: cover;
+      }
+      .nav-link:hover {
+        color: orange !important; /* Change text color on hover */
+      }
+      .nav-link.btn {
+        border-radius: 5px; /* Add rounded corners to buttons */
+      }
+      .modal-content {
+        background-color: #fff; /* Set modal content background color */
+        color: #000; /* Set modal content text color */
+      }
+      .modal-content.dark {
+        background-color: #000; /* Set modal content background color for dark theme */
+        color: #fff; /* Set modal content text color for dark theme */
+      }
+      /* For the product cards */
+      .product-image {
+        height: 200px;
+        object-fit: contain;
+      }
+
+      /* --- Dark Theme Styles --- */
+      .dark-theme body {
+        background-color: #121212;
+        color: #fff;
+      }
+      .dark-theme .modal-content,
+      .dark-theme .card {
+        background-color: #2a2a2a;
+        color: #fff;
+      }
+      .dark-theme .form-control {
+        background-color: #333;
+        color: #fff;
+        border-color: #555;
+      }
+      .dark-theme .form-control::placeholder {
+        color: #aaa;
+      }
+      .dark-theme .alert-info,
+      .dark-theme .alert-success {
+        background-color: #0c5460;
+        color: #d1ecf1;
+        border-color: #0c5460;
+      }
+      .dark-theme .alert-danger {
+        background-color: #5a1a22;
+        color: #f5c6cb;
+        border-color: #5a1a22;
+      }
+      /* Fix for invisible muted text in dark mode */
+      .dark-theme .text-muted {
+        color: #adb5bd !important;
+      }
+    </style>
+
+    <script>
+      (function () {
+        // 'theme' will be 'dark' or 'default'
+        var theme = localStorage.getItem("theme") || "default";
+        if (theme === "dark") {
+          // We apply the class to the <html> tag
+          document.documentElement.classList.add("dark-theme");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('main.index') }}"
+          >E-Commerce Recommendation System</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                data-bs-toggle="modal"
+                data-bs-target="#settingsModal"
+                >Settings</a
+              >
+            </li>
+            {% if session.get('user_id') %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                data-bs-toggle="modal"
+                data-bs-target="#signupModal"
+                >Sign Up</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                data-bs-toggle="modal"
+                data-bs-target="#signinModal"
+                >Sign In</a
+              >
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="container mt-3">
+      {% for category, msg in messages %}
+      <div class="alert alert-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <div>{% block content %}{% endblock %}</div>
+
+    <div
+      class="modal fade"
+      id="signupModal"
+      tabindex="-1"
+      aria-labelledby="signupModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form action="{{ url_for('main.signup') }}" method="POST">
+            <div class="modal-header">
+              <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="signupUsername" class="form-label">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="signupUsername"
+                  name="username"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="signupEmail" class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="signupEmail"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="signupPassword" class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="signupPassword"
+                  name="password"
+                  required
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Sign Up</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="signinModal"
+      tabindex="-1"
+      aria-labelledby="signinModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form action="{{ url_for('main.signin') }}" method="POST">
+            <div class="modal-header">
+              <h5 class="modal-title" id="signinModalLabel">Sign In</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="signinEmail" class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="signinEmail"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="signinPassword" class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="signinPassword"
+                  name="password"
+                  required
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Sign In</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="settingsModal"
+      tabindex="-1"
+      aria-labelledby="settingsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h6>Choose Theme:</h6>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="theme"
+                id="themeDefault"
+                value="default"
+                checked
+              />
+              <label class="form-check-label" for="themeDefault">Default</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="theme"
+                id="themeDark"
+                value="dark"
+              />
+              <label class="form-check-label" for="themeDark">Dark</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary" id="applyTheme">
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer bg-dark text-white">
+      <div class="container" style="padding-top: 20px">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5>About This System</h5>
+                <p>This is an E-Commerce Recommendation System project. It uses Python, Flask, and machine learning (TF-IDF) to analyze product tags and provide content-based recommendations.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none">Home</a></li>
+                    <li><a href="{{ url_for('main.main_app') }}" class="text-white text-decoration-none">Main App</a></li>
+                    <li><a href="#" class="text-white text-decoration-none" data-bs-toggle="modal" data-bs-target="#settingsModal">Settings</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5>Contact Me</h5>
+                <ul class="list-unstyled">
+                    <li><a href="https://github.com/sh-kartik18" target="_blank" class="text-white text-decoration-none"><i class="fab fa-github"></i> GitHub</a></li>
+                    <li><a href="https://linkedin.com/in/sh-kartik" target="_blank" class="text-white text-decoration-none"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                    <li><a href="https://kaggle.com/kartikksh" target="_blank" class="text-white text-decoration-none"><i class="fab fa-kaggle"></i> Kaggle</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-12">
+            <hr class="bg-light" />
+            <p class="text-center">
+              © 2025 Ecommerce Recommendation System. All Rights Reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // --- UPDATED: Settings modal theme apply (uses localStorage) ---
+      document
+        .getElementById("applyTheme")
+        .addEventListener("click", function () {
+          var selectedTheme = document.querySelector(
+            'input[name="theme"]:checked'
+          ).value;
+
+          // 1. Save the choice to localStorage
+          localStorage.setItem("theme", selectedTheme);
+
+          // 2. Apply the theme class to the <html> tag
+          if (selectedTheme === "dark") {
+            document.documentElement.classList.add("dark-theme");
+          } else {
+            document.documentElement.classList.remove("dark-theme");
+          }
+          // 3. Hide the modal
+          var bsModal = bootstrap.Modal.getInstance(
+            document.getElementById("settingsModal")
+          );
+          bsModal.hide();
+        });
+
+      // --- NEW: Set the correct theme radio button when settings modal is opened ---
+      document
+        .getElementById("settingsModal")
+        .addEventListener("show.bs.modal", function () {
+          var currentTheme = localStorage.getItem("theme") || "default";
+          var themeRadio = document.querySelector(
+            'input[name="theme"][value="' + currentTheme + '"]'
+          );
+          if (themeRadio) {
+            themeRadio.checked = true;
+          }
+        });
+
+      // --- NEW: Script for the Recommendation Modal on the Home Page ---
+      const recommendModal = document.getElementById("recommendModal");
+
+      // This check prevents an error on pages that *don't* have the modal
+      if (recommendModal) {
+        // Listen for when the modal is about to be shown
+        recommendModal.addEventListener("show.bs.modal", function (event) {
+          // 1. Get the button that triggered the modal
+          const button = event.relatedTarget;
+
+          // 2. Extract the product name from the data-product-name attribute
+          const productName = button.dataset.productName;
+
+          // 3. Get the HTML elements we need to update
+          const modalTitle = recommendModal.querySelector(".modal-title");
+          const modalBody = recommendModal.querySelector("#modal-body-content");
+
+          // 4. Set the "Loading" state
+          modalTitle.textContent = 'Recommendations for "' + productName + '"';
+          modalBody.innerHTML = `
+        <div class="text-center p-5">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>`;
+
+          // 5. Fetch the recommendations from our new API
+          fetch(`/api/recommend/${encodeURIComponent(productName)}`)
+            .then((response) => response.json())
+            .then((data) => {
+              const recommendations = data.recommendations;
+
+              // 6. Build the new HTML
+              let newHtml = '<div class="row">';
+
+              if (recommendations && recommendations.length > 0) {
+                recommendations.forEach((product) => {
+                  let brandHtml = "";
+                  if (product.Brand && typeof product.Brand === "string") {
+                    const brand = product.Brand.split(" ")[0];
+                    brandHtml = `<p class="card-text">Brand: ${
+                      brand.charAt(0).toUpperCase() + brand.slice(1)
+                    }</p>`;
+                  }
+
+                  // Rating/Reviews: (Default to 0, round rating)
+                  const rating = product.Rating
+                    ? parseFloat(product.Rating).toFixed(1)
+                    : "0.0";
+                  const reviews = product.ReviewCount
+                    ? parseInt(product.ReviewCount)
+                    : "0";
+
+                  // The card HTML (Uses ImageURL_full from our API)
+                  newHtml += `
+                <div class="col-lg-4 col-md-6 mb-4">
+                  <div class="card h-100">
+                    <img src="${
+                      product.ImageURL_full
+                    }" class="card-img-top product-image" alt="${product.Name}">
+                    <div class="card-body">
+                      <h6 class="card-title">${product.Name.substring(
+                        0,
+                        40
+                      )}...</h6>
+                      ${brandHtml}
+                      <p class="card-text">Rating: ${rating} | Reviews: ${reviews}</p>
+                    </div>
+                  </div>
+                </div>
+              `;
+                });
+              } else {
+                newHtml +=
+                  '<div class="col-12"><p>Sorry, no recommendations found for this item.</p></div>';
+              }
+
+              newHtml += "</div>";
+
+              modalBody.innerHTML = newHtml;
+            })
+            .catch((error) => {
+              console.error("Error fetching recommendations:", error);
+              modalBody.innerHTML =
+                '<p class="text-danger">Sorry, an error occurred while loading recommendations.</p>';
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
