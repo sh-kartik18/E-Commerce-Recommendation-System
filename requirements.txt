@@ -6,4 +6,4 @@ scikit-learn
 psycopg2-binary     # The driver for PostgreSQL
 sqlalchemy
 python-dotenv
-
+email-validator
