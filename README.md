@@ -2,114 +2,103 @@
 
 ## Project Overview
 
-This is a **full-stack e-commerce demonstration application** built using **Python Flask** that implements a robust **Content-Based Recommendation System**. The application is designed to showcase proficiency in web development, database integration, and machine learning model deployment.
+This is a **full-stack e-commerce demonstration application** built using **Python/Flask** that implements a robust **Content-Based Recommendation System**. The project showcases proficiency in web development, database integration, and machine learning model deployment, handling data persistence and complex feature engineering.
 
-The system allows users to search the product catalog and receive personalized, relevant recommendations based on product characteristics.
+## ✨ Live Demo & Status
 
-## ✨ Website Features
+The application is fully deployed and operational, connecting the web service to a dedicated external database.
 
-| Feature | Description | Technical Implementation |
+➡️ **Live URL:** [https://e-com-app-6h4m.onrender.com/](https://e-com-app-6h4m.onrender.com/)
+
+### Demo Video
+
+Watch a quick video showcasing the search, recommendation engine, and dynamic theming features:
+
+[![Watch the Demo Video](https://img.youtube.com/vi/HWaRKIvUmsQ/0.jpg)](https://youtu.be/HWaRKIvUmsQ)
+
+---
+
+## 💻 Technical Features
+
+| Feature | Description | Core Technology |
 | :--- | :--- | :--- |
-| **Content-Based Recommendations** | Uses the pre-trained model to find the most similar products based on the search query or a clicked item. | **TF-IDF Vectorization** & **Cosine Similarity** (computed using `scikit-learn`). |
-| **Search Functionality** | Allows users to input partial names (e.g., "blue polish") or exact product names to retrieve results. | **Dual Strategy** (Query-to-Item Search and Item-to-Item Lookup). |
-| **Dynamic Product Cards** | Displays product details pulled from the database, ensuring clean formatting. | Jinja2 templating, custom filters to display **only the first word of the Brand** (capitalized), and safe handling of missing/zero **Ratings** and **Review Counts**. |
-| **Authentication System** | Secure user registration and login functionality. | **Flask-SQLAlchemy** (`User` model) with **`werkzeug.security`** for password hashing. |
-| **Quick Recommendation View** | When a user clicks a product on the homepage, a modal instantly loads 5 related product recommendations via a live API call. | **JavaScript/Fetch API** calls a dedicated Flask route (`/api/recommend`). |
-| **Theming** | Allows users to switch between light (default) and **dark mode**. | **JavaScript `localStorage`** saves the user preference, persisting the theme across sessions and page reloads. |
+| **Content-Based Engine** | Uses **TF-IDF Vectorization** and **Cosine Similarity** (`scikit-learn`) to calculate product similarity based on item tags and descriptions. | **Scikit-learn / Pandas** |
+| **Optimized Model Loading** | **The ML matrix is pre-loaded once from the database** on application startup, minimizing latency for sub-second search responses. | **Python (In-Memory)** |
+| **Dual Search Strategy** | Supports both general queries (Query-to-Item) and exact name matches (Item-to-Item) to maximize relevance. | **Flask/Python Logic** |
+| **Quick Recommendation View** | A homepage modal instantly loads 5 related product recommendations without a page refresh. | **JavaScript/Fetch API** |
+| **Secure Authentication** | User registration and login functionality is secure and persistent. | **Flask-SQLAlchemy & werkzeug.security** |
+| **Dynamic Theming** | Users can toggle and save their preference for **dark mode**. | **JavaScript `localStorage`** |
 
-## 🛠️ Tech Stack
+---
 
-| Category | Technology | Purpose |
+## 🛠️ Tech Stack & Deployment
+
+| Category | Technology | Notes |
 | :--- | :--- | :--- |
-| **Backend** | Python 3 | Core programming language. |
-| **Web Framework** | **Flask** | Routing, request handling, and custom CLI management. |
-| **Database** | **PostgreSQL** | Primary production database (connected via `DATABASE_URL`). |
-| **Database (Dev/Fallback)** | MySQL | Local development environment fallback. |
-| **ORM** | **Flask-SQLAlchemy** | Model definition (`User`, `Product`, `Interactions`) and database management. |
-| **ML & Data** | **Pandas, scikit-learn** | Data handling, TF-IDF model creation, and similarity calculation. |
-| **Frontend** | **Jinja2, Bootstrap 5** | Responsive design, modern UI, and dynamic templating. |
+| **Core Framework** | **Python (Flask) & Gunicorn** | Flask handles the API and routing; Gunicorn handles production serving. |
+| **Database** | **PostgreSQL (Neon)** | Primary production database source for reliability and persistence. |
+| **Data & ML** | **Pandas, Scikit-learn** | Used for data cleaning, transformation, and model generation. |
+| **ORM** | **Flask-SQLAlchemy** | Manages `User`, `Product`, and `Interactions` tables. |
+| **Frontend** | **Bootstrap 5, Jinja2, JavaScript** | Responsive UI and dynamic client-side interactions. |
 
-## 🚀 Deployment
+---
 
-The final application is designed for reliable, scalable hosting.
+## 💡 Future Enhancements
 
-1.  **Compute/Web App:** Deployed on Render.
-2.  **Database:** Hosted on **Neon** (serverless PostgreSQL).
+These features are planned to expand the project's complexity and business value:
 
-The application uses the `DATABASE_URL` environment variable for seamless connection to the live database in production.
+* **Collaborative Filtering Integration:** Implement a second recommendation engine (e.g., using SVD or KNN) based on actual user **ratings and implicit interactions**. This would transition the system from content-based to personalized recommendations.
+* **User Profile Customization:** Allow logged-in users to update their profile details and view their history.
+* **Logging and Metrics:** Implement system logging to track model performance, cold start times, and user search queries.
 
-## 🎬 Live URL
-
-https://e-com-app-6h4m.onrender.com/
+---
 
 ## ⚙️ Local Setup and Installation
 
-Follow these steps to set up the project on your local machine using your PostgreSQL installation.
-
-### Prerequisites
-
-* Python 3.8+
-* PostgreSQL installed locally and running.
-* You must have created the `ecom` database and a user (`myuser`) in your local PostgreSQL.
+Follow these steps to set up the project locally (assumes local PostgreSQL is running).
 
 ### Steps
 
-1.  **Clone the Repository:**
+1.  **Clone & Setup Environment:**
     ```bash
-    git clone https://github.com/sh-kartik18/E-Commerce-Recommendation-System
+    git clone [https://github.com/sh-kartik18/E-Commerce-Recommendation-System](https://github.com/sh-kartik18/E-Commerce-Recommendation-System)
     cd Ecom-Recommendation-System
-    ```
-
-2.  **Create and Activate Virtual Environment:**
-    ```bash
     python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
-    ```
-
-3.  **Install Dependencies:**
-    ```bash
+    source venv/bin/activate
     pip install -r requirements.txt
     ```
 
-4.  **Configure PostgreSQL Connection:**
-    Create a file named **`.env`** in the project root and add your local PostgreSQL connection string.
+2.  **Configure Local DB:** Create a file named **`.env`** and add your local PostgreSQL connection string.
 
     ```dotenv
     # .env file
     DATABASE_URL=postgresql://myuser:mypassword@localhost/ecom
     ```
-    *(Replace username, password, and database name as necessary).*
 
-5.  **Initialize and Populate the Database:**
-    These commands use the custom CLI tools defined in `app/__init__.py`.
-
+3.  **Initialize and Populate Database:**
     ```bash
-    # 1. Create tables (User, Product, Interactions)
-    flask init-db
-
-    # 2. Populate product table from CSVs
-    flask populate-db
+    flask init-db    # Creates all tables
+    flask populate-db # Loads data from CSVs
     ```
 
-6.  **Run the Application:**
+4.  **Run the Application:**
     ```bash
     python run.py
     ```
-    The application will be accessible at `http://127.0.0.1:5000/`.
+
+---
 
 ## 🧑‍💻 Custom CLI Commands
 
-The project uses Flask's CLI for database maintenance:
-
 | Command | Description |
 | :--- | :--- |
-| `flask init-db` | Drops and recreates all SQL database tables based on `app/models.py`. |
+| `flask init-db` | Drops and recreates all SQL database tables. |
 | `flask populate-db` | Reads product data from CSVs and inserts it into the `product` table. |
+
+---
 
 ## 🔗 Contact
 
-* **GitHub:** [https://github.com/sh-kartik18]
-* **LinkedIn:** [https://www.linkedin.com/in/sh-kartik]
-* **Kaggle:** [https://kaggle.com/kartikksh]
-
-Feel free to connect!
+* **GitHub:** [https://github.com/sh-kartik18](https://github.com/sh-kartik18)
+* **LinkedIn:** [https://www.linkedin.com/in/sh-kartik](https://www.linkedin.com/in/sh-kartik)
+* **Kaggle:** [https://kaggle.com/kartikksh](https://kaggle.com/kartikksh)
