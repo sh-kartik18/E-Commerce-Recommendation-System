@@ -33,16 +33,14 @@ The system allows users to search the product catalog and receive personalized, 
 
 The final application is designed for reliable, scalable hosting.
 
-1.  **Compute/Web App:** Not deployed yet.
+1.  **Compute/Web App:** Deployed on Render.
 2.  **Database:** Hosted on **Neon** (serverless PostgreSQL).
 
 The application uses the `DATABASE_URL` environment variable for seamless connection to the live database in production.
 
-## 🎬 Live Demo
+## 🎬 Live URL
 
-Watch a quick 2-minute video demonstrating the search, recommendation engine, and dynamic theming.
-
-[![Watch the Demo Video](https://img.youtube.com/vi/HWaRKIvUmsQ/0.jpg)](https://youtu.be/HWaRKIvUmsQ)
+https://e-com-app-6h4m.onrender.com/
 
 ## ⚙️ Local Setup and Installation
 
