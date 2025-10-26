@@ -5,6 +5,7 @@ import pandas as pd
 import datetime
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from email_validator import validate_email, EmailNotValidError
 
 main = Blueprint('main', __name__)
 
@@ -218,7 +219,20 @@ def recommend():
 def signup():
     username = request.form['username']
     email = request.form['email']
+
+    if len(email.split('.')[-1]) < 2:
+        flash('Email domain is too short.', 'danger')
+        return redirect(url_for('main.index'))
+        
     password = request.form['password']
+
+    try:
+        # This function verifies the email string looks like a real email
+        validate_email(email, allow_smtputf8=False)
+    except EmailNotValidError as e:
+        # If validation fails, flash the specific error message
+        flash(f'Invalid email format: {str(e)}', 'danger')
+        return redirect(url_for('main.index'))
 
     if User.query.filter_by(username=username).first():
         flash('Username already taken.', 'danger')
@@ -278,5 +292,6 @@ def settings():
     db.session.commit()
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('main.index'))
+
 
 
