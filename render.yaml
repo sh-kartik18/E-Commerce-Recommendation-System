@@ -1,0 +1,23 @@
+services:
+  # 1. The Python Web Service (Your Flask App)
+  - type: web
+    name: ecom-recommender
+    runtime: python
+    region: singapore # Choose the region closest to your Neon database (e.g., oregon, frankfurt)
+    plan: free     # Use the free tier
+    
+    # Commands to build your app
+    buildCommand: |
+      pip install -r requirements.txt
+    
+    # Command to start your production server
+    startCommand: gunicorn run:app
+
+    # Environment Variables
+    envVars:
+      - key: FLASK_APP
+        value: app
+      # CRITICAL: This is where you connect to your external Neon database.
+      # You must replace [YOUR_NEON_URI] with your actual, full connection string.
+      - key: DATABASE_URL
+        value: "postgresql://neondb_owner:npg_8xXayzerWi9j@ep-cool-sea-a1tio823-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
