@@ -38,6 +38,12 @@ The final application is designed for reliable, scalable hosting.
 
 The application uses the `DATABASE_URL` environment variable for seamless connection to the live database in production.
 
+## 🎬 Live Demo
+
+Watch a quick 60-second video demonstrating the search, recommendation engine, and dynamic theming.
+
+[![Watch the Demo Video](https://img.youtube.com/vi/HWaRKIvUmsQ/0.jpg)](https://youtu.be/HWaRKIvUmsQ)
+
 ## ⚙️ Local Setup and Installation
 
 Follow these steps to set up the project on your local machine using your PostgreSQL installation.
