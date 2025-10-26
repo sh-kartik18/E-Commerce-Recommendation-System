@@ -34,7 +34,7 @@
               <h5 class="card-title">{{ product.Name[:40] }}{% if product.Name|length > 40 %}...{% endif %}</h5>
               
               {% if product.Brand is string %}
-              <p class="card-text">Brand: {{ product.Brand.split(' ')[0] | capitalize }}</p>
+              <p class="card-text">Brand: {{ product.Brand }}</p>
               {% endif %}
               
               <p class="card-text">Rating: {{ product.Rating | default(0) | round(1) }} | Reviews: {{ product.ReviewCount | default(0) | int }}</p>
@@ -59,3 +59,4 @@
     </div>
   </div>
   </div> {% endblock %}
+
