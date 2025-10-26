@@ -31,12 +31,12 @@ def load_model_data():
     #    This REPLACES pd.read_csv()
     with current_app.app_context():
         # This query selects all products from your 'product' table
-        query = db.select(Product)
+        query = db.select(Product).limit(2500)
+        df = pd.read_sql(query, db.engine) 
         # pd.read_sql uses your app's existing database connection
-        df = pd.read_sql(query, db.engine)
 
     # 2. Keep only the rows we need (where 'Name' is not null)
-    df = df[df['Name'].notna()].reset_index()
+    df = df[df['Name'].notna()].reset_index(drop=True)
 
     # 3. Build the TF-IDF model (same as before)
     tfidf_vectorizer = TfidfVectorizer(stop_words='english')
@@ -292,6 +292,7 @@ def settings():
     db.session.commit()
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('main.index'))
+
 
 
 
