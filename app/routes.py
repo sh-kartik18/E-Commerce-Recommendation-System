@@ -220,6 +220,10 @@ def signup():
     email = request.form['email']
     password = request.form['password']
 
+    if User.query.filter_by(username=username).first():
+        flash('Username already taken.', 'danger')
+        return redirect(url_for('main.index'))
+    
     # Check if email already exists
     if User.query.filter_by(email=email).first():
         flash('Email already registered.', 'danger')
@@ -274,4 +278,5 @@ def settings():
     db.session.commit()
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('main.index'))
+
 
