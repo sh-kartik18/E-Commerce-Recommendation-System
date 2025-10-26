@@ -40,7 +40,7 @@ The application uses the `DATABASE_URL` environment variable for seamless connec
 
 ## 🎬 Live Demo
 
-Watch a quick 60-second video demonstrating the search, recommendation engine, and dynamic theming.
+Watch a quick 2-minute video demonstrating the search, recommendation engine, and dynamic theming.
 
 [![Watch the Demo Video](https://img.youtube.com/vi/HWaRKIvUmsQ/0.jpg)](https://youtu.be/HWaRKIvUmsQ)
 
