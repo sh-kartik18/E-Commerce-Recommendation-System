@@ -279,21 +279,32 @@ def signup():
     return redirect(url_for('main.index'))
 
 # ----------------- Signin -----------------
+# In app/routes.py
+
 @main.route('/signin', methods=['POST'])
 def signin():
-    email = request.form['email']
+    # Capture the input, which could be an email or a username.
+    identifier = request.form['email']
     password = request.form['password']
 
-    user = User.query.filter_by(email=email).first()
+    # 1. Attempt to find the user by their email address.
+    user = User.query.filter_by(email=identifier).first()
+    
+    # 2. If no user is found, attempt to find the user by their username.
+    if user is None:
+        user = User.query.filter_by(username=identifier).first()
+        
+    # 3. Check if a user was found AND the password is correct.
     if user and user.check_password(password):
         session['user_id'] = user.id
         session['username'] = user.username
-        flash(f'Welcome {user.username}!', 'success')
+        flash(f'Welcome back, {user.username}!', 'success')
     else:
-        flash('Invalid email or password.', 'danger')
+        # Generic error message covers both bad identifier and wrong password
+        flash('Invalid username/email or password.', 'danger')
 
     return redirect(url_for('main.index'))
-
+    
 # ----------------- Logout -----------------
 @main.route('/logout')
 def logout():
@@ -317,6 +328,7 @@ def settings():
     db.session.commit()
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('main.index'))
+
 
 
 
