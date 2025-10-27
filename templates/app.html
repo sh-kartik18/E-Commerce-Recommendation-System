@@ -67,9 +67,8 @@
         />
 
         <div class="card-body">
-          <h5 class="card-title">
-            {{ product.Name[:40] }}{% if product.Name|length > 40 %}...{% endif
-            %}
+          <h5 class="card-title" title="{{ product.Name }}">
+              {{ product.Name[:40] }}{% if product.Name|length > 40 %}...{% endif %}
           </h5>
 
           {% if product.Brand %}
@@ -90,4 +89,5 @@
 </div>
 
 {% endblock %}
+
 
