@@ -7,6 +7,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from email_validator import validate_email, EmailNotValidError
 
+main = Blueprint('main', __name__)
+
 @main.teardown_request
 def teardown_session(exception=None):
     """Ensure the session is removed/rolled back after every request."""
@@ -17,8 +19,6 @@ def teardown_session(exception=None):
         # If an error occurred (like the PendingRollbackError), explicitly roll back
         db.session.rollback()
         db.session.remove()
-
-main = Blueprint('main', __name__)
 
 # --- Create placeholders for our model and data ---
 # We will load these *once* when the first request comes in.
@@ -317,6 +317,7 @@ def settings():
     db.session.commit()
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('main.index'))
+
 
 
 
