@@ -7,6 +7,17 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from email_validator import validate_email, EmailNotValidError
 
+@main.teardown_request
+def teardown_session(exception=None):
+    """Ensure the session is removed/rolled back after every request."""
+    if exception is None:
+        # If no error occurred, remove the session
+        db.session.remove()
+    else:
+        # If an error occurred (like the PendingRollbackError), explicitly roll back
+        db.session.rollback()
+        db.session.remove()
+
 main = Blueprint('main', __name__)
 
 # --- Create placeholders for our model and data ---
@@ -219,38 +230,52 @@ def recommend():
 def signup():
     username = request.form['username']
     email = request.form['email']
+    password = request.form['password']
 
+    # 1. TLD Length Check (Preventing single-character TLD typos)
     if len(email.split('.')[-1]) < 2:
         flash('Email domain is too short.', 'danger')
         return redirect(url_for('main.index'))
         
-    password = request.form['password']
-
+    # 2. Email Format and Host Validation (The email-validator check)
     try:
-        # This function verifies the email string looks like a real email
-        validate_email(email, allow_smtputf8=False)
+        # validate_email performs syntax and implicit host/deliverability checks
+        validate_email(email) 
     except EmailNotValidError as e:
-        # If validation fails, flash the specific error message
         flash(f'Invalid email format: {str(e)}', 'danger')
         return redirect(url_for('main.index'))
 
+    # 3. Check for existing UNIQUE constraints *before* committing
     if User.query.filter_by(username=username).first():
         flash('Username already taken.', 'danger')
         return redirect(url_for('main.index'))
-    
-    # Check if email already exists
+        
     if User.query.filter_by(email=email).first():
         flash('Email already registered.', 'danger')
         return redirect(url_for('main.index'))
 
-    # Create new user
+    # Create new user and hash password
     user = User(username=username, email=email)
     user.set_password(password)
 
+    # Add to the session
     db.session.add(user)
-    db.session.commit()
+    
+    # 4. CRITICAL FIX: Transactional Safety (Prevents PendingRollbackError)
+    try:
+        # Attempt to save the user to the database
+        db.session.commit()
+        flash('User registered successfully! Please sign in.', 'success')
+        
+    except Exception as e:
+        # If the commit fails (e.g., race condition, connection issue), 
+        # force the session to be cleaned up.
+        db.session.rollback()
+        
+        # Log the detailed error for debugging and show a generic message to the user
+        print(f"Database signup transaction error: {e}") 
+        flash('An error occurred during registration. Please try again.', 'danger')
 
-    flash('User registered successfully!', 'success')
     return redirect(url_for('main.index'))
 
 # ----------------- Signin -----------------
@@ -292,6 +317,7 @@ def settings():
     db.session.commit()
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('main.index'))
+
 
 
 
