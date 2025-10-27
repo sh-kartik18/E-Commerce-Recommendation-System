@@ -31,7 +31,9 @@
           <div class="card h-100">
             <img src="{{ url_for('static', filename=product.ImageURL) }}" class="card-img-top product-image" alt="{{ product.Name }}">
             <div class="card-body">
-              <h5 class="card-title">{{ product.Name[:40] }}{% if product.Name|length > 40 %}...{% endif %}</h5>
+              <h5 class="card-title" title="{{ product.Name }}">
+                {{ product.Name[:40] }}{% if product.Name|length > 40 %}...{% endif %}
+              </h5>
               
               {% if product.Brand is string %}
               <p class="card-text">Brand: {{ product.Brand }}</p>
@@ -59,4 +61,5 @@
     </div>
   </div>
   </div> {% endblock %}
+
 
