@@ -3,23 +3,25 @@
 
 {% block content %}
 
-<div class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <video class="video-background" autoplay loop muted>
-        <source src="{{ url_for('static', filename='video/promo.mp4') }}" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-    </div>
+<section class="hero">
+  <video class="video-background" autoplay loop muted>
+    <source src="{{ url_for('static', filename='video/promo.mp4') }}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="container hero-content fade-in">
+    <p class="eyebrow">Curated picks</p>
+    <h1 class="display-font mb-3">Minimal, focused shopping recommendations.</h1>
+    <p class="text-muted mb-4">Type a product name and get clean, relevant alternatives in seconds.</p>
+    <a href="{{ url_for('main.main_app') }}" class="btn btn-primary btn-lg">Start Exploring</a>
   </div>
-</div>
-
-<div class="text-center mb-5">
-  <a href="{{ url_for('main.main_app') }}" class="btn btn-primary btn-lg">Go to Main Page</a>
-</div>
+</section>
 
 <div class="container mt-5">
-  <h2 class="text-center mb-4">Trending Products</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-title mb-0">Trending Products</h2>
+    <a href="{{ url_for('main.main_app') }}" class="btn btn-outline-dark btn-sm">Search all</a>
+  </div>
   <div class="row">
     {% for product in trending_products %}
       <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
@@ -31,20 +33,21 @@
           <div class="card h-100">
             <img src="{{ url_for('static', filename=product.ImageURL) }}" class="card-img-top product-image" alt="{{ product.Name }}">
             <div class="card-body">
-              <h5 class="card-title" title="{{ product.Name }}">
+              <h6 class="card-title" title="{{ product.Name }}">
                 {{ product.Name[:40] }}{% if product.Name|length > 40 %}...{% endif %}
-              </h5>
+              </h6>
               
               {% if product.Brand is string %}
-              <p class="card-text">Brand: {{ product.Brand }}</p>
+              <p class="card-text text-muted mb-1">Brand: {{ product.Brand }}</p>
               {% endif %}
               
-              <p class="card-text">Rating: {{ product.Rating | default(0) | round(1) }} | Reviews: {{ product.ReviewCount | default(0) | int }}</p>
+              <p class="card-text text-muted">Rating: {{ product.Rating | default(0) | round(1) }} | Reviews: {{ product.ReviewCount | default(0) | int }}</p>
             </div>
           </div>
         </a> </div>
     {% endfor %}
-  </div> <div class="modal fade" id="recommendModal" tabindex="-1" aria-labelledby="recommendModalLabel" aria-hidden="true">
+  </div>
+  <div class="modal fade" id="recommendModal" tabindex="-1" aria-labelledby="recommendModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl"> <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="recommendModalLabel">Loading...</h5>
@@ -60,6 +63,8 @@
       </div>
     </div>
   </div>
-  </div> {% endblock %}
+</div>
+
+{% endblock %}
 
 
