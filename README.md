@@ -61,7 +61,7 @@ Follow these steps to set up the project locally (assumes local PostgreSQL is ru
 
 1.  **Clone & Setup Environment:**
     ```bash
-    git clone [https://github.com/sh-kartik18/E-Commerce-Recommendation-System](https://github.com/sh-kartik18/E-Commerce-Recommendation-System)
+    git clone [https://github.com/sh-kartik18/E-Commerce-Recommendation-System]
     cd Ecom-Recommendation-System
     python -m venv venv
     source venv/bin/activate
